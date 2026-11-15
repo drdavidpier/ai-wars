@@ -1,9 +1,13 @@
 # AI Wars
 
-A browser trading game. You have 31 days to pay off your venture debt and get rich trading (fictional) AI stocks across the world's tech hubs. Dodge hype crashes, hackers, margin calls and the SEC.
+Run a VC fund through the 2026 AI boom. You have 24 months, a limited pool of LPs, and not enough data center capacity. Buy pre-IPO secondaries low, sell them high, get into hot rounds by bringing compute, and exit before the fund closes. Watch out for the regulators.
 
-**Play:** https://drdavidpier.github.io/ai-wars/
+**Play:** https://drdavidpier.github.io/ai-wars/ · [Original version](https://drdavidpier.github.io/ai-wars/v1/)
 
-A single `index.html` file with no build step and no dependencies. High scores are saved in your browser.
+Plain HTML/JS with no build step:
+- `data.js`: companies, hubs, LPs, news and jokes (edit content here)
+- `engine.js`: game rules, with no UI code
+- `index.html`: the trading-terminal interface
+- `sim.js`: balance simulator (`node sim.js 3000`)
 
-All companies in the game are fictional.
+*Parody. All companies, people and events are fictional. Not investment advice.*

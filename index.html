@@ -4,77 +4,118 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI Wars</title>
+<meta name="description" content="Run a VC fund through the 2026 AI boom. 24 months. Limited LPs. Not enough data centers.">
 <style>
   :root {
-    --bg: #0d0f14;
-    --panel: #151923;
-    --panel2: #1c2230;
-    --line: #2a3242;
-    --text: #e6e9f0;
-    --muted: #8b93a7;
-    --accent: #8b7bff;
-    --good: #3ddc97;
-    --bad: #ff5d73;
-    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --bg: #06080b;
+    --panel: #0d1117;
+    --panel2: #141a22;
+    --line: #232c38;
+    --text: #d9e0ea;
+    --muted: #7d8899;
+    --amber: #ffb020;
+    --good: #35d07f;
+    --bad: #ff4d5e;
+    --blue: #5aa9ff;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; background: var(--bg); color: var(--text);
-    font: 15px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
-  body { min-height: 100vh; }
-  .wrap { max-width: 1000px; margin: 0 auto; padding: 16px; }
-  header.top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
-  h1 { margin: 0; font-size: 26px; letter-spacing: 2px; }
-  h1 span { color: var(--accent); }
+  html, body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 var(--mono); }
+  body { min-height: 100vh; display: flex; flex-direction: column; }
+  .wrap { max-width: 1180px; width: 100%; margin: 0 auto; padding: 12px 16px; flex: 1; }
+  a { color: var(--blue); }
+
+  /* top bar + ticker */
+  .bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: space-between; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+  .logo { font-weight: 800; letter-spacing: 3px; font-size: 20px; }
+  .logo span { color: var(--amber); }
   .where { color: var(--muted); }
-  .where b { color: var(--text); }
-  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-bottom: 12px; }
-  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
-  .stat .k { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
-  .stat .v { font-family: var(--mono); font-size: 18px; font-variant-numeric: tabular-nums; }
-  .v.good { color: var(--good); } .v.bad { color: var(--bad); }
-  .bar { height: 6px; background: #3a1d25; border-radius: 3px; margin-top: 6px; overflow: hidden; }
-  .bar i { display: block; height: 100%; background: var(--good); }
-  .grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; }
-  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
-  .card h2 { margin: 0 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent); }
+  .where b { color: var(--amber); }
+  .ticker { overflow: hidden; white-space: nowrap; border-bottom: 1px solid var(--line); padding: 6px 0; color: var(--amber); font-size: 12px; margin-bottom: 10px; }
+  .ticker .track { display: inline-block; padding-left: 100%; animation: scroll 60s linear infinite; }
+  .ticker .track span { margin-right: 48px; }
+  .ticker .track span::before { content: "▲ "; color: var(--muted); }
+  @keyframes scroll { to { transform: translateX(-100%); } }
+  @media (prefers-reduced-motion: reduce) { .ticker .track { animation: none; padding-left: 0; } }
+
+  /* stats */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 6px; margin-bottom: 10px; }
+  .stat { background: var(--panel); border: 1px solid var(--line); padding: 6px 8px; }
+  .stat .k { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .stat .v { font-size: 16px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .good { color: var(--good); } .bad { color: var(--bad); } .amber { color: var(--amber); } .muted { color: var(--muted); }
+  .meter { height: 5px; background: #3a1820; margin-top: 4px; }
+  .meter i { display: block; height: 100%; }
+
+  .grid { display: grid; grid-template-columns: 1fr 340px; gap: 10px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--panel); border: 1px solid var(--line); padding: 10px; margin-bottom: 10px; }
+  .card h2 { margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--amber); display: flex; justify-content: space-between; }
+  .card h2 small { color: var(--muted); letter-spacing: 0; text-transform: none; font-weight: normal; }
+
   table { width: 100%; border-collapse: collapse; }
-  th, td { padding: 6px 4px; text-align: left; border-bottom: 1px solid var(--line); }
-  th { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-  td.num, th.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
-  td.na { color: #59607a; font-family: var(--mono); font-size: 12px; }
-  .tick { font-family: var(--mono); font-size: 12px; color: var(--accent); margin-right: 6px; }
-  tr:last-child td { border-bottom: 0; }
-  button { font: inherit; cursor: pointer; border-radius: 6px; border: 1px solid var(--line);
-    background: var(--panel2); color: var(--text); padding: 6px 12px; }
-  button:hover:not(:disabled) { border-color: var(--accent); }
+  th, td { padding: 5px 4px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  th { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .tk { color: var(--amber); font-weight: 700; }
+  .co small { display: block; color: var(--muted); font-size: 11px; }
+  .tag { font-size: 10px; padding: 1px 5px; border: 1px solid var(--line); color: var(--muted); }
+  .tag.hot { border-color: #6b3a10; color: var(--amber); }
+  .tag.pub { border-color: #1f4d7a; color: var(--blue); }
+  tr.gone td { color: #4a5363; }
+  tr.gone .tk { color: #4a5363; }
+  .grid > div { min-width: 0; }
+  .tablewrap { overflow-x: auto; }
+  @media (max-width: 640px) {
+    .wrap { padding: 10px; }
+    .hide-sm { display: none; }
+    .co small { display: none; }
+    th, td { padding: 4px 2px; font-size: 12px; }
+    td.num button { display: block; width: 100%; margin: 2px 0; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .hubs button small { display: none; }
+  }
+
+  button { font: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--panel2); color: var(--text); padding: 5px 10px; }
+  button:hover:not(:disabled) { border-color: var(--amber); }
   button:disabled { opacity: .35; cursor: default; }
-  button.primary { background: var(--accent); color: #0b0820; border-color: var(--accent); font-weight: 600; }
+  button.primary { background: var(--amber); color: #120c00; border-color: var(--amber); font-weight: 700; }
   button.danger { border-color: #6b2b38; color: #ffb3c0; }
-  button.sm { padding: 3px 9px; font-size: 13px; }
-  .travel { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
-  .travel button { padding: 10px; text-align: left; }
-  .travel button.here { border-color: var(--accent); color: var(--accent); }
-  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-  .log { font-size: 13px; color: var(--muted); max-height: 180px; overflow-y: auto; }
+  button.sm { padding: 2px 8px; font-size: 12px; }
+  .hubs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .hubs button { text-align: left; padding: 7px 8px; }
+  .hubs button small { display: block; color: var(--muted); font-size: 10px; line-height: 1.3; margin-top: 2px; }
+  .hubs button.here { border-color: var(--amber); color: var(--amber); }
+  .row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 6px; }
+  .lp { border-top: 1px dashed var(--line); padding-top: 6px; margin-top: 6px; }
+  .lp:first-child { border-top: 0; margin-top: 0; padding-top: 0; }
+  .log { font-size: 12px; color: var(--muted); max-height: 220px; overflow-y: auto; }
   .log div { padding: 3px 0; border-bottom: 1px dashed var(--line); }
   .log div:first-child { color: var(--text); }
-  .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.65); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 10; }
-  .modal { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; width: 100%; max-width: 440px; padding: 18px; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
-  .modal h3 { margin: 0 0 10px; color: var(--accent); }
+  .log b { color: var(--amber); font-weight: normal; }
+  footer { color: var(--muted); font-size: 11px; text-align: center; padding: 14px 16px 18px; border-top: 1px solid var(--line); }
+
+  /* modal */
+  .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 10; }
+  .modal { background: var(--panel); border: 1px solid var(--amber); width: 100%; max-width: 480px; padding: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.6); max-height: 92vh; overflow-y: auto; }
+  .modal h3 { margin: 0 0 10px; color: var(--amber); text-transform: uppercase; letter-spacing: 2px; font-size: 14px; }
   .modal .body { margin-bottom: 14px; }
   .modal .btns { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
-  .modal input[type=number] { width: 100%; font: inherit; padding: 8px; border-radius: 6px;
-    border: 1px solid var(--line); background: var(--bg); color: var(--text); }
-  .modal input[type=range] { width: 100%; accent-color: var(--accent); }
-  .chaselog { font-family: var(--mono); font-size: 13px; background: var(--bg); border-radius: 6px; padding: 8px; min-height: 60px; margin: 8px 0; }
-  .muted { color: var(--muted); }
-  .intro { max-width: 520px; margin: 40px auto; }
+  .modal input[type=number], .modal input[type=text] { width: 100%; font: inherit; padding: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+  .modal input[type=range] { width: 100%; accent-color: var(--amber); }
+  .chaselog { background: var(--bg); padding: 8px; min-height: 54px; margin: 8px 0; font-size: 13px; }
+  .card-share { border: 1px solid var(--amber); padding: 14px; text-align: center; margin: 10px 0; background: var(--bg); }
+  .card-share .big { font-size: 28px; color: var(--amber); font-weight: 800; letter-spacing: 1px; }
+
+  .intro { max-width: 620px; margin: 30px auto; }
+  .intro h1 { font-size: 40px; letter-spacing: 6px; margin: 0 0 4px; }
+  .intro h1 span { color: var(--amber); }
   .intro p { color: var(--muted); }
-  .intro label { display: block; margin: 12px 0 4px; font-size: 13px; color: var(--muted); }
-  .intro input, .intro select { width: 100%; font: inherit; padding: 9px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
-  .scores td { font-size: 14px; }
-  .hidden { display: none; }
+  .intro label { display: block; margin: 12px 0 4px; font-size: 12px; color: var(--muted); }
+  .intro input { width: 100%; font: inherit; padding: 9px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+  .intro ul { color: var(--muted); padding-left: 18px; }
+  .intro li { margin: 4px 0; }
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
@@ -83,12 +124,17 @@
   <!-- INTRO -->
   <div id="intro" class="intro card">
     <h1>AI <span>WARS</span></h1>
-    <p>You've taken 5,500 of venture debt from Sandhill Capital and have 2,000 in your brokerage account. You have 31 days to get rich trading AI stocks across the world's tech hubs: buy the dip in one neighbourhood and sell the hype in another. Every move costs a day, and the debt grows 10% a day. Watch for hype spikes, crashes, hackers and the SEC.</p>
-    <label for="pname">Trader name</label>
-    <input id="pname" maxlength="20" placeholder="Name">
-    <label for="pcity">Tech hub</label>
-    <select id="pcity"></select>
-    <div class="actions">
+    <p>It's 2026. Everyone wants in on AI. You've just raised $20M from your Uncle Barry. You have <b class="amber">24 months</b> to turn it into a legendary fund before the LPs want their money back.</p>
+    <ul>
+      <li><b class="amber">Buy low, sell high</b> on pre-IPO secondaries. Prices differ in every hub.</li>
+      <li><b class="amber">Pitch LPs</b> to raise more capital. There are only 8, and each one wants something.</li>
+      <li><b class="amber">Hoard compute.</b> Hot rounds only let you in if you bring data center capacity.</li>
+      <li><b class="amber">Exit</b> before the end. Unsold stakes count at just 50% when the fund closes.</li>
+      <li><b class="amber">Avoid the regulators.</b> If your reputation hits zero, your LPs fire you.</li>
+    </ul>
+    <label for="fname">Name your fund</label>
+    <input id="fname" maxlength="28" placeholder="e.g. Hyperscale Capital">
+    <div class="row" style="margin-top:12px">
       <button class="primary" id="startBtn">Open the terminal</button>
       <button id="introScores">High scores</button>
     </div>
@@ -96,108 +142,71 @@
 
   <!-- GAME -->
   <div id="game" class="hidden">
-    <header class="top">
-      <h1>AI <span>WARS</span></h1>
+    <div class="bar">
+      <div class="logo">AI <span>WARS</span></div>
       <div class="where" id="where"></div>
-    </header>
+    </div>
+    <div class="ticker"><div class="track" id="ticker"></div></div>
     <div class="stats" id="stats"></div>
     <div class="grid">
-      <div class="card">
-        <h2>Exchange</h2>
-        <table>
-          <thead><tr><th>Stock</th><th class="num">Price</th><th class="num">Shares</th><th></th></tr></thead>
-          <tbody id="market"></tbody>
-        </table>
+      <div>
+        <div class="card">
+          <h2>Secondaries <small id="hubLine"></small></h2>
+          <div class="tablewrap"><table>
+            <thead><tr>
+              <th>Company</th><th class="num hide-sm">Mark</th><th class="num hide-sm">Δ mo</th><th class="num">Quote here</th><th class="num hide-sm">Block</th><th class="num">Your stake</th><th></th>
+            </tr></thead>
+            <tbody id="market"></tbody>
+          </table></div>
+        </div>
+        <div class="card">
+          <h2>Newsfeed</h2>
+          <div class="log" id="log"></div>
+        </div>
       </div>
       <div>
         <div class="card">
-          <h2 id="travelTitle">Travel</h2>
-          <div class="travel" id="travel"></div>
-          <div class="actions">
-            <button id="financeBtn">Finance</button>
+          <h2>Fly to <small>1 month per trip</small></h2>
+          <div class="hubs" id="hubs"></div>
+        </div>
+        <div class="card">
+          <h2>Here <small id="hereName"></small></h2>
+          <div id="here"></div>
+        </div>
+        <div class="card">
+          <h2>Fund</h2>
+          <div class="row">
+            <button id="financeBtn">NAV loan</button>
             <button id="scoresBtn">High scores</button>
             <button id="soundBtn">Sound: on</button>
-            <button class="danger" id="finishBtn">Finish</button>
           </div>
-        </div>
-        <div class="card" style="margin-top:12px">
-          <h2>Newsfeed</h2>
-          <div class="log" id="log"></div>
+          <div class="row">
+            <button class="danger" id="closeBtn">Close fund</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
+<footer>Parody. All companies, people and events are fictional. Not investment advice.</footer>
+
 <div id="modalRoot"></div>
 
+<script src="data.js"></script>
+<script src="engine.js"></script>
 <script>
-// ---------- DATA ----------
-const START_CASH = 2000, START_DEBT = 5500, DAYS = 31, START_CAP = 100;
-const DEBT_RATE = 0.10, BANK_RATE = 0.04;
-
-// Fictional companies only.
-const STOCKS = [
-  { n: 'Omnimind',        t: 'OMNI', min: 14000, max: 30000 },
-  { n: 'DeepForge',       t: 'DPFG', min: 5000,  max: 14000 },
-  { n: 'NeuralNorth',     t: 'NRLN', min: 1200,  max: 3600 },
-  { n: 'Hallucinet',      t: 'HLCN', min: 900,   max: 4500 },
-  { n: 'TensorPeak',      t: 'TNSR', min: 600,   max: 1800 },
-  { n: 'Synaptica',       t: 'SYNP', min: 600,   max: 1400 },
-  { n: 'Cortex Robotics', t: 'CRTX', min: 500,   max: 1300 },
-  { n: 'PromptCo',        t: 'PRMT', min: 450,   max: 1300 },
-  { n: 'ChatterBox',      t: 'CHTR', min: 300,   max: 900 },
-  { n: 'GPU Barn',        t: 'GPUB', min: 200,   max: 700 },
-  { n: 'Agentix',         t: 'AGTX', min: 90,    max: 260 },
-  { n: 'VibeCode',        t: 'VIBE', min: 15,    max: 70 },
-];
-
-const CRASHES = {
-  Hallucinet: 'Hallucinet\'s chatbot invented a CEO during a live keynote. Shares crashed!',
-  PromptCo:   'A free open-source model just matched PromptCo\'s flagship. Shares collapsed!',
-  ChatterBox: 'ChatterBox leaked a million users\' chat logs. The stock is in freefall!',
-  VibeCode:   'VibeCode\'s AI agent deleted a customer\'s production database. Investors are dumping it!',
-};
-
-const CITIES = [
-  { name: 'San Francisco', cur: '$', transport: 'Waymo',  locs: ['SoMa', 'Mission', 'Palo Alto', 'Mountain View', 'Menlo Park', 'Cupertino'] },
-  { name: 'New York',      cur: '$', transport: 'Subway', locs: ['Wall Street', 'Midtown', 'Flatiron', 'Hudson Yards', 'Chelsea', 'Navy Yard'] },
-  { name: 'London',        cur: '£', transport: 'Tube',   locs: ['The City', 'Canary Wharf', 'King\'s Cross', 'Shoreditch', 'Mayfair', 'White City'] },
-  { name: 'Tokyo',         cur: '$', transport: 'Metro',  locs: ['Shibuya', 'Roppongi', 'Marunouchi', 'Akihabara', 'Shinjuku', 'Odaiba'] },
-  { name: 'Bangalore',     cur: '$', transport: 'Metro',  locs: ['Koramangala', 'Whitefield', 'Indiranagar', 'Electronic City', 'HSR Layout', 'MG Road'] },
-];
-
-const LAWYERS = [
-  { n: 'Junior Associate',      min: 300, max: 500,  power: 0.08 },
-  { n: 'Securities Litigator',  min: 400, max: 650,  power: 0.10 },
-  { n: 'Big Law Partner',       min: 550, max: 850,  power: 0.13 },
-  { n: 'Ex-SEC Commissioner',   min: 700, max: 1000, power: 0.15 },
-];
-
-const AGENT = 'Agent Voss';
-
-// ---------- HELPERS ----------
+const G = AIW_ENGINE, C = G.C, D = G.D;
 const $ = id => document.getElementById(id);
-const rnd = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
-const chance = p => Math.random() < p;
-const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 function store(key, val) { try { if (val === undefined) return JSON.parse(localStorage.getItem(key)); localStorage.setItem(key, JSON.stringify(val)); } catch (e) { return null; } }
 
-let S = null;
-let soundOn = store('aiw.sound') !== false;
+let S = null, busy = false;
+let soundOn = store('aiw2.sound') !== false;
 
-const city = () => CITIES[S.city];
-const money = n => (n < 0 ? '-' : '') + city().cur + Math.abs(Math.round(n)).toLocaleString();
-const moneyC = (n, c) => (n < 0 ? '-' : '') + c + Math.abs(Math.round(n)).toLocaleString();
-const held = () => Object.values(S.inv).reduce((a, b) => a + b, 0);
-const free = () => S.cap - held();
-const net = () => S.cash + S.bank - S.debt;
-const repColor = h => h > 50 ? 'var(--good)' : h > 25 ? 'var(--accent)' : 'var(--bad)';
-
-// ---------- SOUND (synthesised) ----------
+// ---------- SOUND ----------
 let actx = null;
-function tone(freq, dur, type = 'square', vol = 0.08, slide = 0) {
+function tone(freq, dur, type = 'square', vol = 0.07, slide = 0) {
   if (!soundOn) return;
   try {
     actx = actx || new (window.AudioContext || window.webkitAudioContext)();
@@ -208,7 +217,7 @@ function tone(freq, dur, type = 'square', vol = 0.08, slide = 0) {
     o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + dur);
   } catch (e) {}
 }
-function noise(dur, vol = 0.15) {
+function noise(dur, vol = 0.12) {
   if (!soundOn) return;
   try {
     actx = actx || new (window.AudioContext || window.webkitAudioContext)();
@@ -220,26 +229,27 @@ function noise(dur, vol = 0.15) {
 }
 const SFX = {
   cash:   () => { tone(880, .07, 'sine', .08); setTimeout(() => tone(1320, .12, 'sine', .08), 70); },
-  fire:   () => { tone(600, .12, 'square', .05, 400); },
-  hit:    () => { noise(.12, .15); tone(200, .3, 'sawtooth', .1, -140); },
-  win:    () => { tone(500, .1, 'triangle', .08); setTimeout(() => tone(750, .15, 'triangle', .08), 100); },
+  news:   () => { tone(1000, .05, 'square', .04); setTimeout(() => tone(1000, .05, 'square', .04), 90); },
+  win:    () => { tone(520, .1, 'triangle', .08); setTimeout(() => tone(780, .1, 'triangle', .08), 100); setTimeout(() => tone(1040, .18, 'triangle', .08), 200); },
   alarm:  () => { for (let i = 0; i < 4; i++) setTimeout(() => tone(i % 2 ? 660 : 880, .2, 'square', .05), i * 200); },
-  margin: () => { tone(440, .1, 'square', .07); setTimeout(() => tone(330, .2, 'square', .07), 120); },
-  hacked: () => { for (let i = 0; i < 6; i++) setTimeout(() => tone(rnd(200, 1600), .05, 'square', .05), i * 45); },
-  dead:   () => { tone(400, 1, 'triangle', .12, -330); },
+  margin: () => { tone(440, .1, 'square', .06); setTimeout(() => tone(300, .25, 'square', .06), 120); },
+  hacked: () => { for (let i = 0; i < 7; i++) setTimeout(() => tone(200 + Math.random() * 1400, .05, 'square', .05), i * 45); },
+  hit:    () => { noise(.12, .14); tone(200, .3, 'sawtooth', .08, -140); },
+  dead:   () => tone(400, 1, 'triangle', .1, -330),
   warn:   () => { tone(500, .15, 'square', .06); setTimeout(() => tone(380, .25, 'square', .06), 160); },
-  travel: () => tone(300, .12, 'sine', .06, 200),
+  travel: () => tone(300, .15, 'sine', .06, 300),
 };
+const sfx = k => { if (k && SFX[k]) SFX[k](); };
 
 // ---------- MODALS ----------
 function modal({ title, body, buttons }) {
   return new Promise(resolve => {
     const root = $('modalRoot');
-    root.innerHTML = `<div class="scrim"><div class="modal" role="dialog" aria-modal="true">
+    root.innerHTML = `<div class="scrim"><div class="modal" role="dialog" aria-modal="true" aria-label="${esc(title)}">
       <h3>${title}</h3><div class="body">${body}</div>
-      <div class="btns">${buttons.map((b, i) => `<button data-i="${i}" class="${b.cls || ''}" ${b.disabled ? 'disabled' : ''}>${b.label}</button>`).join('')}</div>
+      <div class="btns">${buttons.map((b, i) => `<button data-i="${i}" class="${b.primary ? 'primary' : ''}" ${b.disabled ? 'disabled' : ''}>${b.label}</button>`).join('')}</div>
     </div></div>`;
-    const first = root.querySelector('input') || root.querySelector('button.primary') || root.querySelector('button');
+    const first = root.querySelector('input') || root.querySelector('button.primary:not(:disabled)') || root.querySelector('.btns button');
     if (first) first.focus();
     root.querySelectorAll('.btns button').forEach(btn => btn.onclick = () => {
       const b = buttons[+btn.dataset.i];
@@ -251,19 +261,21 @@ function modal({ title, body, buttons }) {
     });
   });
 }
-const notice = (title, text) => modal({ title, body: `<p>${text}</p>`, buttons: [{ label: 'OK', cls: 'primary', value: true }] });
-const confirmBox = (title, text, yes = 'Yes', no = 'No') =>
-  modal({ title, body: `<p>${text}</p>`, buttons: [{ label: no, value: false }, { label: yes, cls: 'primary', value: true }] });
+const notice = (title, text) => modal({ title, body: `<p>${text}</p>`, buttons: [{ label: 'OK', primary: true, value: true }] });
 
-function askQty(title, text, max) {
+// Ask for an amount. step 0.1 for $M, 1 for MW.
+function askAmount(title, text, max, step = 0.1, unit = '$M') {
+  max = Math.floor(max / step) * step;
+  const v = +max.toFixed(1);
   return modal({
     title,
     body: `<p>${text}</p>
-      <input type="range" id="qr" min="0" max="${max}" value="${max}">
-      <input type="number" id="qn" min="0" max="${max}" value="${max}" style="margin-top:8px">`,
+      <input type="range" id="qr" min="0" max="${v}" step="${step}" value="${v}">
+      <div class="row"><input type="number" id="qn" min="0" max="${v}" step="${step}" value="${v}" style="flex:1"><span class="muted">${unit}</span></div>
+      <div class="row"><button type="button" class="sm" data-f=".25">25%</button><button type="button" class="sm" data-f=".5">50%</button><button type="button" class="sm" data-f="1">Max</button></div>`,
     buttons: [
       { label: 'Cancel', value: 0 },
-      { label: 'OK', cls: 'primary', read: r => Math.max(0, Math.min(max, Math.floor(+r.querySelector('#qn').value || 0))) },
+      { label: 'OK', primary: true, read: r => Math.max(0, Math.min(v, +r.querySelector('#qn').value || 0)) },
     ],
   });
 }
@@ -271,323 +283,228 @@ document.addEventListener('input', e => {
   if (e.target.id === 'qr') $('qn').value = e.target.value;
   if (e.target.id === 'qn') $('qr').value = e.target.value;
 });
-
-// ---------- GAME SETUP ----------
-function newGame(name, cityIdx) {
-  S = {
-    name: name || 'Anonymous', city: cityIdx, loc: 0, day: 1,
-    cash: START_CASH, bank: 0, debt: START_DEBT, rep: 100, cap: START_CAP,
-    lawyers: [], inv: {}, prices: {}, log: [], over: false,
-  };
-  STOCKS.forEach(s => S.inv[s.n] = 0);
-  rollPrices();
-  addLog(`Day 1. You set up in ${city().locs[0]}, ${city().name}. Sandhill Capital wants ${money(START_DEBT)} back.`);
-  $('intro').classList.add('hidden');
-  $('game').classList.remove('hidden');
-  render();
-}
-
-function rollPrices() {
-  S.prices = {};
-  const avail = STOCKS.filter(() => chance(0.72));
-  while (avail.length < 5) { const s = pick(STOCKS); if (!avail.includes(s)) avail.push(s); }
-  avail.forEach(s => S.prices[s.n] = rnd(s.min, s.max));
-}
-
-function addLog(msg) { S.log.unshift(msg); S.log = S.log.slice(0, 40); }
+document.addEventListener('click', e => {
+  const f = e.target.dataset && e.target.dataset.f;
+  if (f && $('qr')) { const v = (+$('qr').max * +f); const step = +$('qr').step; const val = +(Math.floor(v / step) * step).toFixed(1); $('qr').value = val; $('qn').value = val; }
+});
 
 // ---------- RENDER ----------
-function render() {
-  const c = city();
-  $('where').innerHTML = `<b>${esc(S.name)}</b> · ${c.locs[S.loc]}, ${c.name} · Day <b>${S.day}</b> of ${DAYS}`;
-  const stat = (k, v, cls = '') => `<div class="stat"><div class="k">${k}</div><div class="v ${cls}">${v}</div></div>`;
-  $('stats').innerHTML =
-    stat('Cash', money(S.cash), 'good') +
-    stat('Money market', money(S.bank)) +
-    stat('Venture debt', money(S.debt), S.debt > 0 ? 'bad' : '') +
-    stat('Net worth', money(net()), net() >= 0 ? 'good' : 'bad') +
-    stat('Capacity', `${free()} / ${S.cap}`) +
-    stat('Lawyers', S.lawyers.length) +
-    `<div class="stat"><div class="k">Reputation</div><div class="v">${S.rep}</div><div class="bar"><i style="width:${S.rep}%;background:${repColor(S.rep)}"></i></div></div>`;
+const fm = G.fm, fv = G.fv;
+const repColor = r => r > 50 ? 'var(--good)' : r > 25 ? 'var(--amber)' : 'var(--bad)';
 
-  $('market').innerHTML = STOCKS.map((s, i) => {
-    const p = S.prices[s.n], h = S.inv[s.n];
-    const canBuy = p && S.cash >= p && free() > 0 && !S.over;
-    const canSell = p && h > 0 && !S.over;
-    return `<tr>
-      <td><span class="tick">${s.t}</span>${s.n}</td>
-      <td class="num ${p ? '' : 'na'}">${p ? money(p) : 'HALTED'}</td>
-      <td class="num">${h || ''}</td>
-      <td style="text-align:right;white-space:nowrap">
-        <button class="sm" ${canBuy ? '' : 'disabled'} onclick="buy(${i})">Buy</button>
-        <button class="sm" ${canSell ? '' : 'disabled'} onclick="sell(${i})">Sell</button>
+function render() {
+  const h = G.hub(S);
+  $('where').innerHTML = `<b>${esc(S.fund)}</b> · ${h.n} · Month <b>${S.month}</b>/${C.MONTHS}`;
+  $('ticker').innerHTML = (S.ticker.length ? S.ticker : ['Markets open. Everyone is "AI-native" now.', 'Henson Right spotted in a new jacket.', 'sam altmode: "big things coming"'])
+    .map(t => `<span>${esc(t)}</span>`).join('');
+
+  const t = G.tvpi(S), mk = G.marks(S);
+  const carry = Math.max(0, C.CARRY * (G.closeValue(S) - S.raised * C.HURDLE));
+  const stat = (k, v, cls = '', title = '') => `<div class="stat" title="${title}"><div class="k">${k}</div><div class="v ${cls}">${v}</div></div>`;
+  $('stats').innerHTML =
+    stat('Cash', fm(S.cash), S.cash < 0 ? 'bad' : 'good') +
+    stat('Portfolio marks', fm(mk), '', 'Value of your stakes at current marks') +
+    stat('Compute', `${S.mw}/${S.gridCap} MW`, '', `Power bill ${fm(S.mw * C.POWER_BILL)}/month`) +
+    stat('NAV loan', fm(S.loan), S.loan > 0 ? 'bad' : '', '3%/month') +
+    stat('LP capital', fm(S.raised)) +
+    stat('TVPI at close', `${t.toFixed(2)}×`, t >= 1 ? 'good' : 'bad', 'If you closed now: cash + 50% of stakes and compute − loan, over LP capital') +
+    stat('Carry at close', fm(carry), carry > 0 ? 'amber' : 'muted', '20% of profit above the 8%/yr hurdle') +
+    `<div class="stat"><div class="k">Reputation · ${S.lawyers.length} lawyer${S.lawyers.length === 1 ? '' : 's'}</div><div class="v">${S.rep}</div><div class="meter"><i style="width:${S.rep}%;background:${repColor(S.rep)}"></i></div></div>`;
+
+  $('hubLine').textContent = h.perk;
+  $('market').innerHTML = S.cos.map((c, i) => {
+    const q = S.market.quotes[i];
+    const live = G.active(c);
+    const d = c.pv ? c.v / c.pv - 1 : 0;
+    const status = c.status === 'public' ? `<span class="tag pub">PUBLIC${c.lock ? ` · lockup ${c.lock}` : ''}</span>`
+      : c.status === 'private' ? (c.tier === 'hot' ? '<span class="tag hot">HOT</span>' : '') : `<span class="tag">${c.status.toUpperCase()}</span>`;
+    const quote = !live ? '—' : q ? `${fv(q.q)} <span class="${q.q < c.v ? 'good' : 'bad'}">${q.q < c.v ? '▼' : '▲'}</span>` : '<span class="muted">NO MARKET</span>';
+    const block = !live || !q ? '' : q.block === Infinity ? '∞' : fm(Math.max(0, q.block));
+    const stake = c.own > 0 && live ? `${fm(G.stakeVal(c))}<br><small class="muted">${(c.own * 100).toFixed(c.own < 0.001 ? 3 : 2)}%</small>` : '';
+    return `<tr class="${live ? '' : 'gone'}">
+      <td class="co"><span class="tk">${c.t}</span> ${esc(c.n)} ${status}<small>${esc(c.line)}</small></td>
+      <td class="num hide-sm">${live ? fv(c.v) : '—'}</td>
+      <td class="num hide-sm ${d >= 0 ? 'good' : 'bad'}">${live && S.month > 1 ? `${d >= 0 ? '+' : ''}${(d * 100).toFixed(0)}%` : ''}</td>
+      <td class="num">${quote}</td>
+      <td class="num hide-sm">${block}</td>
+      <td class="num">${stake}</td>
+      <td class="num">
+        <button class="sm" ${G.maxBuy(S, i) >= 0.1 && !busy ? '' : 'disabled'} onclick="doBuy(${i})">Buy</button>
+        <button class="sm" ${G.maxSell(S, i) >= 0.1 && !busy ? '' : 'disabled'} onclick="doSell(${i})">Sell</button>
       </td></tr>`;
   }).join('');
 
-  $('travelTitle').textContent = `Travel by ${c.transport}`;
-  const lastDay = S.day >= DAYS;
-  $('travel').innerHTML = c.locs.map((l, i) =>
-    `<button class="${i === S.loc ? 'here' : ''}" ${i === S.loc || lastDay || S.over ? 'disabled' : ''} onclick="travel(${i})">${l}${i === S.loc ? ' · here' : ''}</button>`
+  const last = S.month >= C.MONTHS;
+  $('hubs').innerHTML = D.HUBS.map((x, i) =>
+    `<button class="${i === S.hub ? 'here' : ''}" ${i === S.hub || last || S.over || busy ? 'disabled' : ''} onclick="doTravel(${i})">${x.n}<small>${x.perk}</small></button>`
   ).join('');
-  $('finishBtn').textContent = lastDay ? 'Cash out (end game)' : 'Finish';
-  $('finishBtn').className = lastDay ? 'primary' : 'danger';
+
+  // Here panel
+  $('hereName').textContent = h.n;
+  let here = '';
+  const cp = S.market.cp;
+  here += `<div><b>Compute</b>: ${cp ? `${fm(cp)}/MW to buy · ${fm(G.computeSellPrice(S))}/MW to sell` : '<span class="bad">No sellers here (export controls)</span>'}</div>
+    <div class="row"><button class="sm" ${G.maxBuyMW(S) >= 1 && !busy ? '' : 'disabled'} onclick="doBuyMW()">Buy MW</button>
+    <button class="sm" ${S.mw >= 1 && cp && !busy ? '' : 'disabled'} onclick="doSellMW()">Sell MW</button></div>`;
+  const lps = G.lpsHere(S);
+  if (lps.length) {
+    here += '<div style="margin-top:10px"><b>LPs here</b></div>';
+    for (const l of lps) {
+      const req = G.lpReq(S, l);
+      let st;
+      if (l.status === 'cool') st = `<span class="muted">Passed. Try again in ${l.cool} month${l.cool === 1 ? '' : 's'}.</span>`;
+      else if (req) st = `<span class="bad">${req}</span>`;
+      else if (S.pitched) st = '<span class="muted">One pitch per visit.</span>';
+      else st = `<button class="sm primary" ${busy ? 'disabled' : ''} onclick="doPitch('${l.id}')">Pitch (${Math.round(G.pitchChance(S) * 100)}% chance)</button>`;
+      here += `<div class="lp">${esc(l.n)} · <span class="amber">${fm(l.amt)}</span>${l.note ? `<br><small class="muted">${l.note}</small>` : ''}<div class="row">${st}</div></div>`;
+    }
+  }
+  const committed = S.lps.filter(l => l.status === 'in' && l.hub && l.hub === h.id);
+  if (committed.length) here += `<div class="muted" style="margin-top:6px">Already in: ${committed.map(l => esc(l.n)).join(', ')}</div>`;
+  if (S.lawyerOffer) {
+    const o = S.lawyerOffer;
+    here += `<div style="margin-top:10px"><b>Lawyer for hire</b>: ${o.lawyer.n} · ${fm(o.price)}</div>
+      <div class="row"><button class="sm" ${S.cash >= o.price && !busy ? '' : 'disabled'} onclick="doHire()">Hire</button></div>`;
+  }
+  $('here').innerHTML = here;
+
+  $('closeBtn').textContent = last ? 'Close the fund' : 'Close fund early';
+  $('closeBtn').className = last ? 'primary' : 'danger';
   $('soundBtn').textContent = `Sound: ${soundOn ? 'on' : 'off'}`;
-  $('log').innerHTML = S.log.map(m => `<div>${m}</div>`).join('');
+  $('log').innerHTML = S.log.map(l => `<div><b>M${l.m}</b> ${esc(l.msg)}</div>`).join('');
 }
 
-// ---------- TRADING ----------
-async function buy(i) {
-  const s = STOCKS[i], p = S.prices[s.n];
-  if (!p) return;
-  const afford = Math.floor(S.cash / p);
-  if (afford < 1) return notice('Buy', `You can't afford ${s.t} at ${money(p)}.`);
-  if (free() < 1) return notice('Buy', 'Your account is at capacity. Sell something or upgrade.');
-  const max = Math.min(afford, free());
-  const q = await askQty(`Buy ${s.t}`, `${s.n} trades at ${money(p)}. You can afford ${afford} shares and have capacity for ${free()}.`, max);
-  if (q > 0) {
-    S.cash -= q * p; S.inv[s.n] += q; SFX.cash();
-    addLog(`Bought ${q} ${s.t} for ${money(q * p)}.`);
-  }
+// ---------- ACTIONS ----------
+async function doBuy(i) {
+  const c = S.cos[i], q = S.market.quotes[i], max = G.maxBuy(S, i);
+  const a = await askAmount(`Buy ${c.t}`,
+    `${esc(c.n)} is quoted at <b>${fv(q.q)}</b> here (mark ${fv(c.v)}). ${q.block === Infinity ? '' : `Block available: ${fm(q.block)}. `}You have ${fm(S.cash)}.`, max);
+  if (a > 0 && G.buy(S, i, a)) sfx('cash');
   render();
 }
-
-async function sell(i) {
-  const s = STOCKS[i], p = S.prices[s.n];
-  if (!p) return notice('Sell', `${s.t} is halted here today.`);
-  const h = S.inv[s.n];
-  if (!h) return;
-  const q = await askQty(`Sell ${s.t}`, `${s.n} bids ${money(p)}. You hold ${h} shares.`, h);
-  if (q > 0) {
-    S.cash += q * p; S.inv[s.n] -= q; SFX.cash();
-    addLog(`Sold ${q} ${s.t} for ${money(q * p)}.`);
-  }
+async function doSell(i) {
+  const c = S.cos[i], q = S.market.quotes[i], max = G.maxSell(S, i);
+  const a = await askAmount(`Sell ${c.t}`,
+    `Buyers here pay <b>${fv(q.q)}</b> (mark ${fv(c.v)}). Your stake is worth ${fm(c.own * q.q * 1000)} at this price.${q.demand !== Infinity ? ` Buyers want up to ${fm(q.demand)}.` : ''}`, max);
+  if (a > 0 && G.sell(S, i, a)) sfx('cash');
   render();
 }
+async function doBuyMW() {
+  const n = await askAmount('Buy compute', `${fm(S.market.cp)} per MW. Grid room: ${S.gridCap - S.mw} MW. Power bill: ${fm(C.POWER_BILL)}/MW/month.`, G.maxBuyMW(S), 1, 'MW');
+  if (n > 0 && G.buyCompute(S, n)) sfx('cash');
+  render();
+}
+async function doSellMW() {
+  const n = await askAmount('Sell compute', `Buyers pay ${fm(G.computeSellPrice(S))} per MW. You have ${S.mw} MW.`, S.mw, 1, 'MW');
+  if (n > 0 && G.sellCompute(S, n)) sfx('cash');
+  render();
+}
+async function doPitch(id) {
+  const r = G.pitch(S, id);
+  if (!r) return;
+  sfx(r.ok ? 'win' : 'margin');
+  render();
+  await notice(r.ok ? 'Commitment!' : 'Pass', esc(r.msg));
+}
+function doHire() { if (G.hireLawyer(S)) sfx('cash'); render(); }
 
-// ---------- FINANCE ----------
 async function finance() {
   while (true) {
-    const choice = await modal({
-      title: 'Finance',
+    const ch = await modal({
+      title: 'NAV loan · Apollyon Credit',
       body: `<table>
-        <tr><td>Cash</td><td class="num">${money(S.cash)}</td></tr>
-        <tr><td>Money market <span class="muted">(+${BANK_RATE * 100}%/day)</span></td><td class="num">${money(S.bank)}</td></tr>
-        <tr><td>Venture debt <span class="muted">(+${DEBT_RATE * 100}%/day)</span></td><td class="num" style="color:var(--bad)">${money(S.debt)}</td></tr>
+        <tr><td>Loan</td><td class="num bad">${fm(S.loan)}</td></tr>
+        <tr><td>Interest</td><td class="num">${C.LOAN_RATE * 100}% / month</td></tr>
+        <tr><td>Can borrow</td><td class="num">${fm(G.maxBorrow(S))}</td></tr>
+        <tr><td colspan="2" class="muted">Limit: ${C.LOAN_LTV * 100}% of marks. If the loan grows past ${C.COVENANT * 100}% of marks, Apollyon seizes part of your biggest stake.</td></tr>
       </table>`,
       buttons: [
-        { label: 'Deposit', value: 'dep', disabled: S.cash < 1 },
-        { label: 'Withdraw', value: 'wd', disabled: S.bank < 1 },
-        { label: 'Repay debt', value: 'pay', disabled: S.cash < 1 || S.debt < 1 },
-        { label: 'Done', cls: 'primary', value: 'done' },
+        { label: 'Borrow', value: 'b', disabled: G.maxBorrow(S) < 0.1 },
+        { label: 'Repay', value: 'r', disabled: S.loan < 0.01 || S.cash < 0.1 },
+        { label: 'Done', primary: true, value: 'done' },
       ],
     });
-    if (choice === 'done') break;
-    if (choice === 'dep') { const a = await askQty('Deposit', 'How much do you want to move into the money market?', S.cash); S.cash -= a; S.bank += a; if (a) addLog(`Deposited ${money(a)}.`); }
-    if (choice === 'wd')  { const a = await askQty('Withdraw', 'How much do you want to withdraw?', S.bank); S.bank -= a; S.cash += a; if (a) addLog(`Withdrew ${money(a)}.`); }
-    if (choice === 'pay') { const a = await askQty('Repay debt', 'How much do you want to repay Sandhill Capital?', Math.min(S.cash, S.debt)); S.cash -= a; S.debt -= a; if (a) { SFX.cash(); addLog(`Repaid ${money(a)} to Sandhill Capital.`); } }
+    if (ch === 'done') break;
+    if (ch === 'b') { const a = await askAmount('Borrow', 'How much?', G.maxBorrow(S)); if (a > 0) G.borrow(S, a); }
+    if (ch === 'r') { const a = await askAmount('Repay', 'How much?', Math.min(S.cash, S.loan + 0.05)); if (a > 0) G.repay(S, a); }
     render();
   }
   render();
 }
 
-// ---------- TRAVEL & EVENTS ----------
-let busy = false;
-async function travel(i) {
-  if (busy || S.over || S.day >= DAYS) return;
+async function drain() {
   busy = true;
-  SFX.travel();
-  S.loc = i; S.day++;
-  S.debt = Math.round(S.debt * (1 + DEBT_RATE));
-  S.bank = Math.round(S.bank * (1 + BANK_RATE));
-  rollPrices();
-  addLog(`Day ${S.day}. You take the ${city().transport} to ${city().locs[i]}.`);
-  render();
-
-  await marketEvent();
-  render();
-  await encounter();
-  if (!S.over) {
+  while (S.pending.length) {
+    const ev = S.pending[0];
     render();
-    if (S.day === DAYS) {
-      SFX.warn();
-      await notice('Last trading day', held() > 0
-        ? 'This is your last trading day. Any shares you still hold get written off when your fund winds down, so sell everything.'
-        : 'This is your last trading day. Repay your debt and cash out.');
-    }
+    sfx(ev.hit ? 'hit' : ev.sfx);
+    ev.hit = false;
+    if (ev.meter) ev.sfx = null; // only sound the alarm once per investigation
+    let body = `<p>${ev.text}</p>`;
+    if (ev.meter) body = `<div>${ev.text}</div><div class="meter"><i style="width:${S.rep}%;background:${repColor(S.rep)}"></i></div><div class="chaselog">${ev.lines.map(esc).join('<br>')}</div>`;
+    const key = await modal({ title: ev.title, body, buttons: ev.options.map(o => ({ label: o.label, value: o.key, primary: o.primary, disabled: o.disabled })) });
+    G.resolve(S, key);
   }
   busy = false;
-  if (!S.over) render();
+  render();
+  if (S.over) endGame();
 }
 
-async function marketEvent() {
-  if (!chance(0.22)) return;
-  const onMarket = STOCKS.filter(s => S.prices[s.n]);
-  if (chance(0.55)) {
-    const s = pick(onMarket.length ? onMarket : STOCKS);
-    S.prices[s.n] = rnd(s.min, s.max) * rnd(3, 5);
-    const msg = chance(0.5)
-      ? `${s.n} just demoed a model that beats every benchmark. ${s.t} is through the roof!`
-      : `Retail traders on social media are piling into ${s.t}. The price is insane!`;
-    addLog(msg); await notice('Breaking news', msg);
-  } else {
-    const name = pick(Object.keys(CRASHES));
-    const s = STOCKS.find(x => x.n === name);
-    S.prices[name] = Math.max(1, Math.round(rnd(s.min, s.max) / rnd(3, 6)));
-    addLog(CRASHES[name]); await notice('Breaking news', CRASHES[name]);
-  }
+async function doTravel(i) {
+  if (busy || !G.travel(S, i)) return;
+  sfx('travel');
+  await drain();
 }
 
-async function encounter() {
-  const secChance = 0.06 + Math.min(0.14, held() * 0.0008);
-  if (chance(secChance)) return investigation();
-  if (!chance(0.28)) return;
-  const loc = city().locs[S.loc];
-  const kind = pick(['hacked', 'vested', 'friend', 'margin', 'upgrade', 'upgrade', 'lawyer', 'lawyer']);
-
-  if (kind === 'hacked' && S.cash > 0) {
-    const lost = Math.round(S.cash * rnd(15, 40) / 100);
-    S.cash -= lost; SFX.hacked();
-    const msg = `You clicked a phishing link on the ${city().transport} to ${loc}. Hackers drained ${money(lost)} from your account!`;
-    addLog(msg); return notice('Hacked!', msg);
-  }
-  if (kind === 'vested' || kind === 'friend') {
-    if (free() < 1) return;
-    const s = pick(STOCKS), n = Math.min(free(), rnd(2, 10));
-    S.inv[s.n] += n;
-    const msg = kind === 'vested'
-      ? `Stock options from an old job just vested: ${n} shares of ${s.n}!`
-      : `A founder friend in ${loc} hands you ${n} pre-IPO shares of ${s.n}. "Don't tell anyone."`;
-    addLog(msg); return notice('Lucky break', msg);
-  }
-  if (kind === 'margin') {
-    SFX.margin();
-    const holding = STOCKS.filter(s => S.inv[s.n] > 0);
-    let msg = 'Margin call! Your broker is nervous.';
-    if (holding.length && chance(0.5)) {
-      const s = pick(holding), lost = Math.max(1, Math.round(S.inv[s.n] * rnd(20, 50) / 100));
-      S.inv[s.n] -= lost;
-      msg += ` They force-sold ${lost} shares of ${s.t} and kept the proceeds.`;
-    } else msg += ' You covered it just in time.';
-    addLog(msg); return notice('Margin call', msg);
-  }
-  if (kind === 'upgrade') {
-    const price = rnd(180, 400), extra = rnd(15, 25);
-    if (S.cash < price) return;
-    const ok = await confirmBox('Account upgrade', `Your broker offers a Pro account with ${extra} more shares of capacity for ${money(price)}. Upgrade?`);
-    if (ok) { S.cash -= price; S.cap += extra; SFX.cash(); addLog(`Upgraded to Pro (+${extra} capacity).`); }
-    return;
-  }
-  if (kind === 'lawyer') {
-    const l = pick(LAWYERS), price = rnd(l.min, l.max);
-    if (S.cash < price) return;
-    const ok = await confirmBox('Legal help', `A ${l.n} offers to join your legal team for a ${money(price)} retainer. Hire them?`);
-    if (ok) { S.cash -= price; S.lawyers.push(l); SFX.cash(); addLog(`Hired a ${l.n}.`); }
-  }
-}
-
-async function investigation() {
-  let auditors = 1 + rnd(0, Math.min(4, 1 + Math.floor(S.day / 8)));
-  const start = auditors;
-  SFX.alarm();
-  const team = n => `${AGENT} and ${n - 1} auditor${n - 1 === 1 ? '' : 's'}`;
-  addLog(`SEC investigation! ${team(auditors)} are looking at your trades.`);
-  let lines = [`${team(auditors)} are investigating your trades!`];
-
-  while (true) {
-    const power = S.lawyers.reduce((a, l) => a + l.power, 0);
-    const act = await modal({
-      title: 'SEC investigation',
-      body: `<div>Reputation: <b>${S.rep}</b> · Investigators: <b>${auditors}</b> · Lawyers: <b>${S.lawyers.length}</b></div>
-        <div class="bar"><i style="width:${S.rep}%;background:${repColor(S.rep)}"></i></div>
-        <div class="chaselog">${lines.join('<br>')}</div>`,
-      buttons: [
-        { label: 'Go dark', cls: 'primary', value: 'run' },
-        { label: 'Stall', value: 'stand' },
-        { label: 'Lawyer up', value: 'fight', disabled: S.lawyers.length === 0 },
-      ],
-    });
-    lines = [];
-    if (act === 'run') {
-      if (chance(Math.max(0.25, 0.62 - auditors * 0.05))) {
-        addLog('You went dark and the SEC lost interest.');
-        return notice('Off the hook', 'You wiped your group chats and they lost the trail.');
-      }
-      lines.push("They've already traced your trades!");
-    } else if (act === 'stand') {
-      lines.push('You say nothing and hope it blows over.');
-    } else {
-      SFX.fire();
-      if (chance(Math.min(0.85, 0.25 + power))) {
-        auditors--; setTimeout(SFX.win, 150);
-        lines.push(auditors ? 'Your lawyers get one auditor\'s evidence thrown out!' : `Your lawyers get ${AGENT}'s case dismissed!`);
-        if (auditors === 0) return investigationWon(start);
-      } else lines.push('Your lawyers file a motion. Denied.');
-    }
-    await new Promise(r => setTimeout(r, 250));
-    if (chance(Math.min(0.75, 0.28 + auditors * 0.06))) {
-      const dmg = rnd(4, 9) + auditors;
-      S.rep = Math.max(0, S.rep - dmg);
-      SFX.hit();
-      lines.push(`A subpoena hits the press! (−${dmg} reputation)`);
-      if (S.rep <= 0) return barred();
-    } else lines.push('They request more documents. Nothing sticks, yet.');
-  }
-}
-
-async function investigationWon(n) {
-  const award = rnd(800, 1600) * n;
-  S.cash += award;
-  addLog(`Case dismissed. You counter-sued and won ${money(award)}.`);
-  await notice('Case dismissed', `The investigation collapses. You counter-sue for harassment and win ${money(award)}.`);
-  if (S.rep < 100) {
-    const cost = (100 - S.rep) * rnd(20, 40);
-    if (S.cash >= cost) {
-      const ok = await confirmBox('Crisis PR', `A crisis PR firm will restore your reputation to 100 for ${money(cost)}. Pay?`);
-      if (ok) { S.cash -= cost; S.rep = 100; addLog(`Paid a PR firm ${money(cost)}.`); }
-    }
-  }
-}
-
-async function barred() {
-  SFX.dead();
-  addLog('You were barred from trading.');
-  S.over = true; render();
-  await notice('Barred', `Your reputation is gone. The SEC barred you from trading for life on day ${S.day}.`);
-  return endGame(true);
-}
-
-// ---------- END / SCORES ----------
-async function endGame(dead) {
-  S.over = true; render();
-  const score = net();
-  const scores = store('aiw.scores') || [];
-  const entry = { name: S.name, score, cur: city().cur, date: new Date().toLocaleDateString(), dead };
+// ---------- END ----------
+const SCORE_KEY = 'aiw2.scores';
+async function endGame() {
+  const r = S.result || G.finalize(S);
+  render();
+  const scores = store(SCORE_KEY) || [];
+  const entry = { fund: S.fund, carry: r.carry, tvpi: r.tvpi, title: r.title, fired: r.fired, date: new Date().toLocaleDateString() };
   scores.push(entry);
-  scores.sort((a, b) => b.score - a.score);
+  scores.sort((a, b) => b.carry - a.carry || b.tvpi - a.tvpi);
   const top = scores.slice(0, 10);
-  store('aiw.scores', top);
-  const made = top.includes(entry);
-  await modal({
-    title: dead ? 'Game over' : 'You cashed out',
-    body: `<p>Final net worth: <b style="color:${score >= 0 ? 'var(--good)' : 'var(--bad)'}">${money(score)}</b>
-      <span class="muted">(cash + money market − debt)</span></p>
-      <p>${made ? 'You made the high score list!' : "That wasn't enough to make the high score list."}</p>
+  store(SCORE_KEY, top);
+  const url = location.href.split('#')[0].split('?')[0];
+  const share = r.fired
+    ? `My AI fund "${S.fund}" got fired by its LPs in month ${r.month}. Can you survive the 2026 AI boom? ${url}`
+    : `My AI fund "${S.fund}" returned ${r.tvpi.toFixed(2)}× TVPI and made ${fm(r.carry)} in carry. Title: ${r.title}. Can you beat it? ${url}`;
+  sfx(r.fired || r.tvpi < 1 ? 'dead' : 'win');
+  const ch = await modal({
+    title: r.fired ? 'Fired' : 'Fund closed',
+    body: `<div class="card-share">
+        <div class="muted">${esc(S.fund).toUpperCase()} · FUND I</div>
+        <div class="big">${r.title.toUpperCase()}</div>
+        <div>${r.tvpi.toFixed(2)}× TVPI · ${fm(r.carry)} carry</div>
+      </div>
+      <table>
+        <tr><td>LP capital</td><td class="num">${fm(r.raised)}</td></tr>
+        <tr><td>Value at close</td><td class="num">${fm(r.value)}</td></tr>
+        <tr><td>Hurdle (8%/yr)</td><td class="num">${fm(r.hurdle)}</td></tr>
+        <tr><td>Your carry (20%)</td><td class="num amber">${fm(r.carry)}</td></tr>
+      </table>
+      <p class="muted">${top.includes(entry) ? 'You made the high score list.' : "That wasn't enough for the high score list."}</p>
       ${scoresTable(top, entry)}`,
-    buttons: [{ label: 'Play again', cls: 'primary', value: 'again' }],
+    buttons: [
+      { label: 'Copy result', value: 'copy' },
+      { label: 'Post on X', value: 'x' },
+      { label: 'Play again', primary: true, value: 'again' },
+    ],
   });
+  if (ch === 'copy') { try { await navigator.clipboard.writeText(share); } catch (e) {} await notice('Copied', esc(share)); }
+  if (ch === 'x') window.open('https://x.com/intent/post?text=' + encodeURIComponent(share), '_blank', 'noopener');
   showIntro();
 }
 
 function scoresTable(list, hl) {
   if (!list.length) return '<p class="muted">No scores yet.</p>';
-  return `<table class="scores"><tr><th>#</th><th>Name</th><th class="num">Score</th><th>Date</th></tr>${list.map((s, i) =>
-    `<tr style="${s === hl ? 'color:var(--accent)' : ''}"><td>${i + 1}</td><td>${esc(s.name)}${s.dead ? ' <span class="muted">(BARRED)</span>' : ''}</td><td class="num">${moneyC(s.score, s.cur)}</td><td class="muted">${esc(s.date)}</td></tr>`
+  return `<table><tr><th>#</th><th>Fund</th><th class="num">Carry</th><th class="num">TVPI</th><th>Title</th></tr>${list.map((s, i) =>
+    `<tr style="${s === hl ? 'color:var(--amber)' : ''}"><td>${i + 1}</td><td>${esc(s.fund)}</td><td class="num">${fm(s.carry)}</td><td class="num">${s.tvpi.toFixed(2)}×</td><td class="muted">${esc(s.title)}</td></tr>`
   ).join('')}</table>`;
 }
-
-function showScores() {
-  return modal({ title: 'High scores', body: scoresTable(store('aiw.scores') || []), buttons: [{ label: 'Close', cls: 'primary', value: 1 }] });
-}
+const showScores = () => modal({ title: 'High scores', body: scoresTable(store(SCORE_KEY) || []), buttons: [{ label: 'Close', primary: true, value: 1 }] });
 
 function showIntro() {
   $('game').classList.add('hidden');
@@ -595,28 +512,29 @@ function showIntro() {
 }
 
 // ---------- WIRING ----------
-$('pcity').innerHTML = CITIES.map((c, i) => `<option value="${i}">${c.name}</option>`).join('');
-$('pname').value = store('aiw.name') || '';
+$('fname').value = store('aiw2.fund') || '';
 $('startBtn').onclick = () => {
-  const name = $('pname').value.trim();
-  store('aiw.name', name);
-  newGame(name, +$('pcity').value);
+  const name = $('fname').value.trim() || 'Untitled Ventures';
+  store('aiw2.fund', name);
+  S = G.newGame(name);
+  $('intro').classList.add('hidden');
+  $('game').classList.remove('hidden');
+  render();
 };
-$('pname').onkeydown = e => { if (e.key === 'Enter') $('startBtn').click(); };
+$('fname').onkeydown = e => { if (e.key === 'Enter') $('startBtn').click(); };
 $('introScores').onclick = showScores;
 $('scoresBtn').onclick = showScores;
 $('financeBtn').onclick = () => { if (!busy && !S.over) finance(); };
-$('soundBtn').onclick = () => { soundOn = !soundOn; store('aiw.sound', soundOn); render(); if (soundOn) SFX.cash(); };
-$('finishBtn').onclick = async () => {
+$('soundBtn').onclick = () => { soundOn = !soundOn; store('aiw2.sound', soundOn); render(); if (soundOn) SFX.cash(); };
+$('closeBtn').onclick = async () => {
   if (busy || S.over) return;
-  if (S.day >= DAYS) return endGame(false);
-  const choice = await modal({
-    title: 'Finish',
-    body: '<p>End this game now and record your score, or quit and start over?</p>',
-    buttons: [{ label: 'Keep playing', value: 'no' }, { label: 'Quit (no score)', value: 'quit' }, { label: 'Cash out now', cls: 'primary', value: 'end' }],
+  const last = S.month >= C.MONTHS;
+  const ok = last ? true : await modal({
+    title: 'Close fund early?',
+    body: `<p>Closing now ends the game. Unexited stakes and compute count at 50%. TVPI at close right now: <b>${G.tvpi(S).toFixed(2)}×</b>.</p>`,
+    buttons: [{ label: 'Keep going', value: false }, { label: 'Close the fund', primary: true, value: true }],
   });
-  if (choice === 'end') endGame(false);
-  if (choice === 'quit') showIntro();
+  if (ok) { G.finalize(S); endGame(); }
 };
 </script>
 </body>
