@@ -122,7 +122,8 @@
 
   /* ---------- LAYOUT ---------- */
   .grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; }
-  .grid > div { min-width: 0; }
+  .grid > div, .charts > div { min-width: 0; }
+  .card h2 { flex-wrap: wrap; }
   .charts { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 16px; }
   @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
   @media (max-width: 760px) { .charts { grid-template-columns: 1fr; } }
@@ -156,6 +157,9 @@
   .delta.good { background: rgba(22, 163, 74, .12); }
   .delta.bad { background: rgba(229, 72, 77, .12); }
   .actions { display: flex; gap: 6px; justify-content: flex-end; }
+  .c-mob { display: none; }
+  .dot { color: var(--muted); margin: 0 6px; }
+  .nw { white-space: nowrap; }
 
   /* side panels */
   .hubs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -202,7 +206,25 @@
   .hidden { display: none !important; }
 
   @media (max-width: 760px) {
-    .wrap { padding: 12px; }
+    .wrap { padding: 10px; }
+    .card { padding: 12px; margin-bottom: 12px; border-radius: 16px; }
+    .grid, .charts { gap: 12px; }
+    /* Secondaries: each company becomes a two-line row; no horizontal scroll. */
+    .tablewrap { overflow: visible; }
+    #market, #market tr, #market td { display: block; }
+    table thead { display: none; }
+    #market tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 10px; row-gap: 3px;
+      padding: 9px 0; border-bottom: 1px solid var(--line); }
+    #market tr:last-child { border-bottom: 0; }
+    #market td { padding: 0; border: 0; background: none !important; }
+    #market .c-wide { display: none; }
+    #market .c-co { grid-column: 1; grid-row: 1; min-width: 0; }
+    #market .c-mob { display: block; grid-column: 1; grid-row: 2; font-size: 12px; color: var(--muted); min-width: 0; }
+    #market .c-mob b { color: var(--text); }
+    #market .c-mob .delta { padding: 0 6px; font-size: 11px; }
+    #market .c-act { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+    #market .co b { overflow-wrap: anywhere; }
+    #market .actions { flex-direction: row; }
     .stats { grid-template-columns: 1fr 1fr; gap: 10px; }
     .hero { grid-column: 1 / span 2; grid-row: 1; }
     .stat .v { font-size: 20px; }
@@ -267,7 +289,7 @@
           <h2>Secondaries <small id="hubLine"></small></h2>
           <div class="tablewrap"><table>
             <thead><tr>
-              <th>Company</th><th class="num hide-sm">Mark</th><th class="num hide-sm">Δ month</th><th class="num">Quote here</th><th class="num hide-sm">Block</th><th class="num">Your stake</th><th></th>
+              <th>Company</th><th class="c-mob"></th><th class="num">Mark</th><th class="num">Δ month</th><th class="num">Quote here</th><th class="num">Block</th><th class="num">Your stake</th><th></th>
             </tr></thead>
             <tbody id="market"></tbody>
           </table></div>
@@ -536,14 +558,19 @@ function render() {
     const block = !live || !q ? '' : q.block === Infinity ? '∞' : fm(Math.max(0, q.block));
     const stake = c.own > 0 && live ? `<b>${fm(G.stakeVal(c))}</b><br><small class="muted">${(c.own * 100).toFixed(c.own < 0.001 ? 3 : 2)}%</small>` : '';
     const delta = live && S.month > 1 ? `<span class="delta ${d >= 0 ? 'good' : 'bad'}">${d >= 0 ? '+' : ''}${(d * 100).toFixed(0)}%</span>` : '';
+    // Compact second line, shown only on phones in place of the numeric columns.
+    const mob = !live ? `<span class="muted">${c.status === 'dead' ? 'Shut down' : 'Exited'}</span>`
+      : [q ? `<span class="nw">Quote ${quote}</span>` : '<span class="muted">No market here</span>', delta,
+         c.own > 0 ? `<span class="nw">Stake <b>${fm(G.stakeVal(c))}</b></span>` : ''].filter(Boolean).join('<span class="dot">·</span>');
     return `<tr class="${live ? '' : 'gone'}">
-      <td><div class="co"><div class="av">${c.t}</div><div><b>${esc(c.n)}</b>${status}<small>${esc(c.line)}</small></div></div></td>
-      <td class="num hide-sm">${live ? fv(c.v) : '—'}</td>
-      <td class="num hide-sm">${delta}</td>
-      <td class="num">${quote}</td>
-      <td class="num hide-sm muted">${block}</td>
-      <td class="num">${stake}</td>
-      <td><div class="actions">
+      <td class="c-co"><div class="co"><div class="av">${c.t}</div><div><b>${esc(c.n)}</b>${status}<small>${esc(c.line)}</small></div></div></td>
+      <td class="c-mob">${mob}</td>
+      <td class="num c-wide">${live ? fv(c.v) : '—'}</td>
+      <td class="num c-wide">${delta}</td>
+      <td class="num c-wide">${quote}</td>
+      <td class="num c-wide muted">${block}</td>
+      <td class="num c-wide">${stake}</td>
+      <td class="c-act"><div class="actions">
         <button class="sm chip" ${G.maxBuy(S, i) >= 0.1 && !busy ? '' : 'disabled'} onclick="doBuy(${i})">Buy</button>
         <button class="sm" ${G.maxSell(S, i) >= 0.1 && !busy ? '' : 'disabled'} onclick="doSell(${i})">Sell</button>
       </div></td></tr>`;
